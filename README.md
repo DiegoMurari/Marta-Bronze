@@ -1,4 +1,4 @@
-"""# Marta Murari Bronze
+# Marta Murari Bronze
 
 Um site profissional de bronzeamento natural e artificial, com painel administrativo completo para gestão de serviços e galeria de resultados. Desenvolvido com foco em performance, responsividade e facilidade de manutenção.
 
@@ -84,4 +84,3 @@ Este projeto está licenciado sob a [MIT License](LICENSE).
 ---
 
 **Marta Murari Bronze** – 💛 Unindo técnica e cuidado para resultados impecáveis no bronzeamento!
-"""
