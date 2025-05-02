@@ -1,122 +1,126 @@
 // src/pages/GaleriaAdmin.jsx
 
-import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import { supabase } from '../lib/supabase'
+import { useNavigate } from 'react-router-dom'
+import AdminNav from '../components/AdminNav'
 
 export default function GaleriaAdmin() {
-  const [tipo, setTipo] = useState('par');
-  const [antesFile, setAntesFile] = useState(null);
-  const [depoisFile, setDepoisFile] = useState(null);
-  const [outroFile, setOutroFile] = useState(null);
-  const [galeria, setGaleria] = useState([]);
-  const navigate = useNavigate();
+  const [tipo, setTipo] = useState('par')
+  const [antesFile, setAntesFile] = useState(null)
+  const [depoisFile, setDepoisFile] = useState(null)
+  const [outroFile, setOutroFile] = useState(null)
+  const [galeria, setGaleria] = useState([])
+  const navigate = useNavigate()
 
   // Proteção de rota e carregamento inicial
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) navigate('/login');
-      else fetchGaleria();
-    });
-  }, [navigate]);
+      if (!data.user) navigate('/login')
+      else fetchGaleria()
+    })
+  }, [navigate])
 
   async function fetchGaleria() {
     const { data, error } = await supabase
       .from('galeria')
       .select('*')
-      .order('created_at', { ascending: false });
-    if (!error) setGaleria(data);
+      .order('created_at', { ascending: false })
+    if (!error) setGaleria(data)
   }
 
   function makeName(file) {
     return `${Date.now()}-${file.name
       .replace(/\s+/g, '-')
-      .replace(/[^a-zA-Z0-9.\-_]/g, '')}`;
+      .replace(/[^a-zA-Z0-9.\-_]/g, '')}`
   }
 
   async function uploadToBucket(bucket, file, name) {
-    const { error } = await supabase.storage.from(bucket).upload(name, file);
-    if (error) throw error;
-    const raw = `https://tejfxzohagfhevpwefdh.supabase.co/storage/v1/object/public/${bucket}/${name}`;
-    const u = new URL(raw);
-    u.pathname = u.pathname.replace(/\/{2,}/g, '/');
-    return u.toString();
+    const { error } = await supabase.storage.from(bucket).upload(name, file)
+    if (error) throw error
+    const raw = `https://tejfxzohagfhevpwefdh.supabase.co/storage/v1/object/public/${bucket}/${name}`
+    const u = new URL(raw)
+    u.pathname = u.pathname.replace(/\/{2,}/g, '/')
+    return u.toString()
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
-      let data = { tipo };
+      let data = { tipo }
 
       if (tipo === 'par') {
         if (!antesFile || !depoisFile) {
-          alert('Selecione as duas imagens (antes e depois)!');
-          return;
+          alert('Selecione as duas imagens (antes e depois)!')
+          return
         }
-        const nameA = makeName(antesFile);
-        const nameD = makeName(depoisFile);
-        data.imagem_antes = await uploadToBucket('galeria', antesFile, nameA);
-        data.imagem_depois = await uploadToBucket('galeria', depoisFile, nameD);
+        const nameA = makeName(antesFile)
+        const nameD = makeName(depoisFile)
+        data.imagem_antes = await uploadToBucket('galeria', antesFile, nameA)
+        data.imagem_depois = await uploadToBucket('galeria', depoisFile, nameD)
       } else {
         if (!outroFile) {
-          alert('Selecione uma imagem!');
-          return;
+          alert('Selecione uma imagem!')
+          return
         }
-        const nameO = makeName(outroFile);
-        data.imagem = await uploadToBucket('galeria', outroFile, nameO);
+        const nameO = makeName(outroFile)
+        data.imagem = await uploadToBucket('galeria', outroFile, nameO)
       }
 
-      await supabase.from('galeria').insert([data]);
-      alert('Enviado com sucesso!');
-      setAntesFile(null);
-      setDepoisFile(null);
-      setOutroFile(null);
-      fetchGaleria();
+      await supabase.from('galeria').insert([data])
+      alert('Enviado com sucesso!')
+      setAntesFile(null)
+      setDepoisFile(null)
+      setOutroFile(null)
+      fetchGaleria()
     } catch (err) {
-      console.error(err);
-      alert('Erro: ' + err.message);
+      console.error(err)
+      alert('Erro: ' + err.message)
     }
-  };
+  }
 
   // Novo handleDelete: remove do Storage e do banco
   const handleDelete = async (item) => {
-    if (!confirm('Deseja realmente excluir este item?')) return;
+    if (!confirm('Deseja realmente excluir este item?')) return
 
     try {
       // 1) Apagar do storage
-      const bucket = supabase.storage.from('galeria');
-      const pathsToRemove = [];
+      const bucket = supabase.storage.from('galeria')
+      const pathsToRemove = []
 
       if (item.tipo === 'par') {
         // extrai somente o nome do arquivo da URL
-        const antesKey = item.imagem_antes.split('/').pop();
-        const depoisKey = item.imagem_depois.split('/').pop();
-        pathsToRemove.push(antesKey, depoisKey);
+        const antesKey = item.imagem_antes.split('/').pop()
+        const depoisKey = item.imagem_depois.split('/').pop()
+        pathsToRemove.push(antesKey, depoisKey)
       } else {
-        const key = item.imagem.split('/').pop();
-        pathsToRemove.push(key);
+        const key = item.imagem.split('/').pop()
+        pathsToRemove.push(key)
       }
 
-      const { error: storageError } = await bucket.remove(pathsToRemove);
-      if (storageError) throw storageError;
+      const { error: storageError } = await bucket.remove(pathsToRemove)
+      if (storageError) throw storageError
 
       // 2) Deletar registro no banco
       const { error: dbError } = await supabase
         .from('galeria')
         .delete()
-        .eq('id', item.id);
-      if (dbError) throw dbError;
+        .eq('id', item.id)
+      if (dbError) throw dbError
 
       // 3) Atualizar estado local
-      setGaleria((g) => g.filter((gItem) => gItem.id !== item.id));
+      setGaleria((g) => g.filter((gItem) => gItem.id !== item.id))
     } catch (err) {
-      console.error('Erro ao excluir:', err);
-      alert('Não foi possível excluir: ' + err.message);
+      console.error('Erro ao excluir:', err)
+      alert('Não foi possível excluir: ' + err.message)
     }
-  };
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-6">
+      {/* Submenu de navegação */}
+      <AdminNav />
+
       <h2 className="text-2xl mb-4 font-semibold text-rose-700">Gerenciar Galeria</h2>
       <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow mb-8">
         <label className="block mb-2">
@@ -206,5 +210,5 @@ export default function GaleriaAdmin() {
         ))}
       </div>
     </div>
-  );
+  )
 }

@@ -36,7 +36,7 @@ export default function Gallery() {
     <section id="galeria" className="py-20 bg-white px-6">
       <div className="max-w-6xl mx-auto text-center">
         <h3 className="text-3xl font-display font-semibold text-rose-700 mb-10">
-          Antes e Depois
+          Resultados
         </h3>
         <p className="text-gray-600 mb-12 max-w-xl mx-auto">
           Veja o bronzeamento finalizado de nossas clientes.
