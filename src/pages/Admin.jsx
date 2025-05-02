@@ -13,7 +13,6 @@ export default function Admin() {
   const [sucesso, setSucesso] = useState(null)
   const navigate = useNavigate()
 
-  // 1) Auth + fetch
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return navigate('/login')
@@ -21,37 +20,32 @@ export default function Admin() {
     })
   }, [navigate])
 
-  // 2) Fetch all
   async function fetchServicos() {
     const { data, error } = await supabase.from('servicos').select('*')
     if (error) console.error('Erro ao buscar:', error)
     else setServicos(data)
   }
 
-  // 3) Price formatting
   const formatPrice = (value) => {
-    const num =
-      typeof value === 'string'
-        ? parseFloat(value.replace(',', '.')) || 0
-        : value
+    const num = typeof value === 'string'
+      ? parseFloat(value.replace(',', '.')) || 0
+      : value
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
     }).format(num)
   }
 
-  // 4) Prepare form to edit
   const startEdit = (s) => {
     setEditingId(s.id)
     setTitulo(s.titulo)
     setDescricao(s.descricao)
     setPreco(s.preco)
-    setImagem(null) // troca só se carregar nova imagem
+    setImagem(null)
     setSucesso(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  // 5) Create or update
   const handleSubmit = async (e) => {
     e.preventDefault()
     let urlImagem = null
@@ -72,30 +66,37 @@ export default function Admin() {
         .getPublicUrl(nome).data.publicUrl
     }
 
-    const payload = { titulo, descricao, preco, ...(urlImagem && { imagem: urlImagem }) }
+    const payload = { titulo, descricao, preco }
+    if (urlImagem) payload.imagem = urlImagem
 
     if (editingId) {
       const { error } = await supabase
         .from('servicos')
         .update(payload)
         .eq('id', editingId)
-      if (error) alert('Erro ao atualizar: ' + error.message)
-      else setSucesso('Serviço atualizado!')
+      if (error) {
+        alert('Erro ao atualizar: ' + error.message)
+        return
+      }
+      setSucesso('Serviço atualizado!')
     } else {
       const { error } = await supabase.from('servicos').insert([payload])
-      if (error) alert('Erro ao cadastrar: ' + error.message)
-      else setSucesso('Serviço cadastrado!')
+      if (error) {
+        alert('Erro ao cadastrar: ' + error.message)
+        return
+      }
+      setSucesso('Serviço cadastrado!')
     }
 
+    // reset form + fetch atualizado
     setTitulo('')
     setDescricao('')
     setPreco('')
     setImagem(null)
     setEditingId(null)
-    fetchServicos()
+    await fetchServicos()
   }
 
-  // 6) Delete
   const excluirServico = async (id) => {
     if (!confirm('Deseja mesmo excluir?')) return
     const { error } = await supabase.from('servicos').delete().eq('id', id)
@@ -105,7 +106,6 @@ export default function Admin() {
 
   return (
     <div className="min-h-screen bg-rose-50 p-6">
-      {/* ← Submenu de navegação */}
       <AdminNav />
 
       <form

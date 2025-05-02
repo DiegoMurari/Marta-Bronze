@@ -1,5 +1,3 @@
-// src/components/Gallery.jsx
-
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -16,6 +14,7 @@ function cleanUrl(raw) {
 
 export default function Gallery() {
   const [fotos, setFotos] = useState([]);
+  const [imagemSelecionada, setImagemSelecionada] = useState(null); // <- Modal
 
   useEffect(() => {
     async function fetchGaleria() {
@@ -51,7 +50,7 @@ export default function Gallery() {
             <div key={f.id} className="bg-pink-50 p-6 rounded-lg shadow">
               {f.tipo === 'par' ? (
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
+                  <div onClick={() => setImagemSelecionada(cleanUrl(f.imagem_antes))} className="cursor-pointer">
                     <img
                       src={cleanUrl(f.imagem_antes)}
                       alt="Antes"
@@ -59,7 +58,7 @@ export default function Gallery() {
                     />
                     <p className="mt-2 text-sm font-medium text-rose-700">Antes</p>
                   </div>
-                  <div>
+                  <div onClick={() => setImagemSelecionada(cleanUrl(f.imagem_depois))} className="cursor-pointer">
                     <img
                       src={cleanUrl(f.imagem_depois)}
                       alt="Depois"
@@ -69,19 +68,32 @@ export default function Gallery() {
                   </div>
                 </div>
               ) : (
-                <div>
+                <div onClick={() => setImagemSelecionada(cleanUrl(f.imagem))} className="cursor-pointer">
                   <img
                     src={cleanUrl(f.imagem)}
                     alt="Resultado"
                     className="w-full h-64 object-cover rounded"
                   />
-                  {/* opcional: caso queira legenda para "outros", adicione aqui */}
                 </div>
               )}
             </div>
           ))}
         </div>
       </div>
+
+      {/* Modal de visualização */}
+      {imagemSelecionada && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+          onClick={() => setImagemSelecionada(null)}
+        >
+          <img
+            src={imagemSelecionada}
+            alt="Imagem Ampliada"
+            className="max-w-full max-h-full rounded-lg shadow-lg border-4 border-white"
+          />
+        </div>
+      )}
     </section>
   );
 }
