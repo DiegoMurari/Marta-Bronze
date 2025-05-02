@@ -1,9 +1,16 @@
 // src/components/Header.jsx
 import React from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-scroll'
 import logo from '../assets/logo.png'
 
 export default function Header() {
+  // **ADICIONADO**: reseta margins/paddings do <body> para 0 e garante que não haja gap acima do conteúdo
+  useEffect(() => {
+    document.body.style.margin = '0'
+    document.body.style.padding = '0'
+  }, [])
+
   return (
     <header className="fixed top-0 w-full bg-pink-600 z-50 shadow">
       <div className="container mx-auto px-6 flex items-center h-16">
@@ -15,20 +22,20 @@ export default function Header() {
                 •-top-2   → move 0.5rem para cima
             - Desktop (md+): volta ao fluxo normal (static) e sem offset.
         */}
-      <img
-        src={logo}
-        alt="Logo Marta Murari Bronze"
-        className="
-          relative
-            -left-4       /* mobile: 1rem para a esquerda */
-            top-2         /* mobile: 0.5rem para baixo */
-          h-20           /* mobile: 5rem de altura */
-          mr-2
-          md:-left-4     /* desktop: 2rem para a esquerda */
-          md:top-1.5       /* desktop: sem offset vertical, centralizado */
-          md:h-17        /* desktop: 4rem de altura */
-        "
-      />
+        <img
+          src={logo}
+          alt="Logo Marta Murari Bronze"
+          className="
+            relative
+              -left-4       /* mobile: 1rem para a esquerda */
+              top-2         /* mobile: 0.5rem para baixo */
+            h-20           /* mobile: 5rem de altura */
+            mr-2
+            md:-left-4     /* desktop: 2rem para a esquerda */
+            md:top-1.5     /* desktop: sem offset vertical, centralizado */
+            md:h-17        /* desktop: 4rem de altura */
+          "
+        />
 
         {/* Texto só no desktop */}
         <div className="hidden md:block text-white font-bold text-2xl">

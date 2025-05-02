@@ -34,7 +34,12 @@ export default function App() {
   return (
     <>
       <Header />
-      <main className="pt-24">
+      {/*
+        Aqui ajustamos o padding-top para 
+        exatamente a altura do header (h-16 = 4rem),
+        eliminando o gap branco.
+      */}
+      <main className="pt-16">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
