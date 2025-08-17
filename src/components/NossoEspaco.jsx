@@ -72,7 +72,7 @@ export default function NossoEspaco() {
         <div className="aspect-video w-full rounded-lg overflow-hidden shadow">
           <iframe
             title="Localização Marta Bronze"
-            src="https://www.google.com/maps/embed?pb=!4v1746142580691!6m8!1m7!1sKtDOE9GjcARX_jA9CSwq2Q!2m2!1d-20.54865110063763!2d-47.37319080310605!3f256.6245784263526!4f-1.146465331605981!5f0.7820865974627469"
+            src="https://www.google.com/maps/embed?pb=!4v1755425719554!6m8!1m7!1sQ-z3-t4nXZCaJhPMkvoVrQ!2m2!1d-20.52865388014803!2d-47.39797229999699!3f111.53660671451439!4f3.54939048643314!5f1.2957055266087638"
             className="w-full h-full border-0"
             allowFullScreen
             loading="lazy"
